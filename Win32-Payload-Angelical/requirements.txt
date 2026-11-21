@@ -1,0 +1,3 @@
+# Dependencias do Win32-Payload-Angelical
+# Somente pywin32 (acesso a API GDI do Windows). So instala no Windows.
+pywin32; sys_platform == "win32"
