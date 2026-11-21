@@ -36,41 +36,98 @@ def _gl_ctx():
 
 
 def _criar_janela(glfw, titulo, w, h):
-    """Cria uma janela borderless maximizada. Retorna (window, w, h)."""
+    """Cria uma janela cheia de tela. Retorna (window, w, h).
+
+    Estrategia: passa o monitor primario a create_window (GLFW cria uma
+    janela fullscreen sem decoracoes). Se isso falhar, cai para uma janela
+    maximizada borderless. Retorna tamanhos de framebuffer reais.
+    """
     if not glfw.init():
         raise RuntimeError(
             "glfw nao conseguiu inicializar (sem display?): verifique se ha "
             "um display ativo e se o GLFW esta instalado.")
-    glfw.window_hint(glfw.DECORATED, 0)
+
+    monitor = None
+    fw, fh = w, h
     try:
-        glfw.window_hint(glfw.SAMPLES, 4)
+        monitor = glfw.get_primary_monitor()
     except Exception:
-        pass
-    try:
-        window = glfw.create_window(w, h, titulo, None, None)
-    except Exception:
-        window = None
-    if not window:
-        glfw.terminate()
-        raise RuntimeError("glfw.create_window falhou (janela nao criada).")
-    glfw.make_context_current(window)
-    try:
-        glfw.maximize_window(window)
-    except Exception:
+        monitor = None
+
+    if monitor:
         try:
-            glfw.set_window_size(window, w, h)
+            xpos, ypos, fw, fh = glfw.get_monitor_workarea(monitor)
+            if fw < 16 or fh < 16:
+                fw, fh = w, h
         except Exception:
             pass
+
+    # Hints para contexto OpenGL core profile (necessario para #version 330 core).
+    def _set_hints(major, minor, core=True):
+        try:
+            glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, major)
+            glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, minor)
+            if core and hasattr(glfw, "OPENGL_PROFILE"):
+                glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
+        except Exception:
+            pass
+        try:
+            glfw.window_hint(glfw.SAMPLES, 4)
+        except Exception:
+            pass
+
+    def _create(hint):
+        hint()
+        monitors = (monitor, None) if monitor else (None,)
+        for mon in monitors:
+            try:
+                win = glfw.create_window(fw, fh, titulo, mon, None)
+            except Exception:
+                win = None
+            if win:
+                return win, mon
+        return None, None
+
+    window = None
+    used_monitor = None
+    for (major, minor, core) in [(3, 3, True), (3, 2, True), (3, 1, True), (3, 1, False), (None, None, False)]:
+        if major is None:
+            def hint():
+                pass
+        else:
+            def hint():
+                _set_hints(major, minor, core)
+        try:
+            window, used_monitor = _create(hint)
+        except Exception:
+            window = None
+        if window:
+            break
+    if not window:
+        glfw.terminate()
+        raise RuntimeError(
+            "glfw.create_window falhou em todos os perfis tentados. "
+            "Verifique se ha display ativo e se o GLFW esta instalado.")
+
+    glfw.make_context_current(window)
+
+    if not used_monitor:
+        try:
+            glfw.maximize_window(window)
+        except Exception:
+            pass
+
     try:
         glfw.show_window(window)
     except Exception:
         pass
+
     try:
-        fw, fh = glfw.get_framebuffer_size(window)
-        if fw < 16 or fh < 16:
-            fw, fh = w, h
+        fw2, fh2 = glfw.get_framebuffer_size(window)
+        if fw2 >= 16 and fh2 >= 16:
+            fw, fh = fw2, fh2
     except Exception:
-        fw, fh = w, h
+        pass
     return window, fw, fh
 
 
@@ -229,3 +286,36 @@ def run_all_gl(fps=60, tempo_por_payload=10.0):
         print("[INFO] Engine finalizado.")
     finally:
         pass
+
+def test_engine():
+    """Teste rapido do engine OpenGL (janela + 5 quadros do Anjo Trono).
+
+    Retorna True se o engine criou janela, renderizou e encerrou com sucesso.
+    """
+    try:
+        from .gl_effects import OphanimAngelGl
+        with GlEngine(fps=60) as engine:
+            engine.iniciar("Win32-Payload-Angelical - teste GL")
+            effect = OphanimAngelGl()
+            import time as _t
+            inicio = _t.time()
+            quadros = 0
+            while quadros < 5 and (_t.time() - inicio) < 1.0:
+                agora = _t.time()
+                dt = min(0.05, agora - (engine._prev or agora))
+                engine._prev = agora
+                t = agora - engine._t0
+                fw, fh = engine.glfw.get_framebuffer_size(engine.window)
+                engine.renderer.resize(fw, fh)
+                engine.gl.glViewport(0, 0, fw, fh)
+                effect.update(dt, fw, fh, t)
+                effect.draw(engine.renderer, fw, fh, t)
+                engine.renderer.flush()
+                engine.glfw.swap_buffers(engine.window)
+                engine.glfw.poll_events()
+                quadros += 1
+            engine.encerrar()
+        return True
+    except Exception as e:
+        print("[ERRO] Engine GL falhou: {}".format(e))
+        return False

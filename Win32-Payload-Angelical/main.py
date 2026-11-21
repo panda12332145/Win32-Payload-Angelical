@@ -148,7 +148,16 @@ def main():
     ap.add_argument("--fps", type=int, default=60, help="quadros por segundo (padrao 60)")
     ap.add_argument("--engine", choices=("auto", "gl", "gdi"), default="auto",
                     help="engine de renderizacao (padrao: auto)")
+    ap.add_argument("--gl-check", action="store_true",
+                    help="Testa o engine OpenGL (janela + 5 quadros) e sai")
     args = ap.parse_args()
+
+    if args.gl_check:
+        from src.gl_engine import test_engine
+        print("[INFO] Testando o engine OpenGL...")
+        ok = test_engine()
+        print("[RESULTADO] OpenGL:", "OK" if ok else "FALHOU")
+        sys.exit(0 if ok else 1)
 
     engine_nome = _resolve_engine(args.engine)
     (run_effect, run_all, list_effects, EFFECTS, ANGEL_GDI) = _carregar_engine(engine_nome)

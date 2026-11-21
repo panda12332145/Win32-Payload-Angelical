@@ -25,6 +25,11 @@ cd Win32-Payload-Angelical
 pip install -r requirements.txt
 ```
 
+> ⚠️ Após uma atualização do repositório, rode `pip install -r requirements.txt`
+> novamente — o modo OpenGL usa `PyOpenGL` + `glfw`, que precisam estar instalados.
+> O menu mostra "Engine: OpenGL (3D)" quando o modo GL está ativo.
+> Teste rápido do engine: `python main.py --gl-check`
+
 Dependências:
 - `pywin32` — modo GDI (antigo).
 - `PyOpenGL` + `glfw` — modo OpenGL (3D, recomendado).
