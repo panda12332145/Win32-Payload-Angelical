@@ -13,6 +13,7 @@ import win32con
 import win32gui
 
 from .base import Payload
+from .fonts import criar_fonte
 
 
 class BlueScreenPayload(Payload):
@@ -48,27 +49,20 @@ class BlueScreenPayload(Payload):
         y = int(h * 0.18)
 
         # Fonte grande para o ":(" e fonte menor para o corpo do texto.
-        fonte_grande = win32gui.CreateFont(
-            -int(h * 0.12), 0, 0, 0, win32con.FW_NORMAL,
-            0, 0, 0, 0, 0, 0, 0, 0, "Segoe UI")
-        fonte_corpo = win32gui.CreateFont(
-            -int(h * 0.028), 0, 0, 0, win32con.FW_NORMAL,
-            0, 0, 0, 0, 0, 0, 0, 0, "Segoe UI")
+        fonte_grande = criar_fonte(-int(h * 0.12),
+                                  peso=win32con.FW_NORMAL, face="Segoe UI")
+        fonte_corpo = criar_fonte(-int(h * 0.028),
+                                 peso=win32con.FW_NORMAL, face="Segoe UI")
 
         for i, linha in enumerate(self._LINHAS):
-            if i == 0:
-                old = win32gui.SelectObject(hdc, fonte_grande)
-                win32gui.TextOut(hdc, margem_x, y, linha)
+            fonte = fonte_grande if i == 0 else fonte_corpo
+            if fonte is not None:
+                old = win32gui.SelectObject(hdc, fonte)
+            win32gui.TextOut(hdc, margem_x, y, linha)
+            if fonte is not None:
                 win32gui.SelectObject(hdc, old)
-                y += int(h * 0.16)
-            else:
-                old = win32gui.SelectObject(hdc, fonte_corpo)
-                win32gui.TextOut(hdc, margem_x, y, linha)
-                win32gui.SelectObject(hdc, old)
-                y += int(h * 0.045)
+            y += int(h * 0.16) if i == 0 else int(h * 0.045)
 
-        win32gui.DeleteObject(fonte_grande)
-        win32gui.DeleteObject(fonte_corpo)
 
 
 class ErrorDialogPayload(Payload):
@@ -115,22 +109,22 @@ class ErrorDialogPayload(Payload):
             win32gui.SetBkMode(hdc, win32con.TRANSPARENT)
 
             # Texto do titulo (branco).
-            fonte_t = win32gui.CreateFont(
-                -15, 0, 0, 0, win32con.FW_BOLD, 0, 0, 0, 0, 0, 0, 0, 0, "Arial")
-            old_f = win32gui.SelectObject(hdc, fonte_t)
+            fonte_t = criar_fonte(-15, peso=win32con.FW_BOLD, face="Arial")
+            if fonte_t is not None:
+                old_f = win32gui.SelectObject(hdc, fonte_t)
             win32gui.SetTextColor(hdc, self.rgb(255, 255, 255))
             win32gui.TextOut(hdc, x + 8, y + 6, random.choice(self._TITULOS))
-            win32gui.SelectObject(hdc, old_f)
-            win32gui.DeleteObject(fonte_t)
+            if fonte_t is not None:
+                win32gui.SelectObject(hdc, old_f)
 
             # Texto da mensagem (preto).
-            fonte_m = win32gui.CreateFont(
-                -14, 0, 0, 0, win32con.FW_NORMAL, 0, 0, 0, 0, 0, 0, 0, 0, "Arial")
-            old_f = win32gui.SelectObject(hdc, fonte_m)
+            fonte_m = criar_fonte(-14, peso=win32con.FW_NORMAL, face="Arial")
+            if fonte_m is not None:
+                old_f = win32gui.SelectObject(hdc, fonte_m)
             win32gui.SetTextColor(hdc, self.rgb(20, 20, 20))
             win32gui.TextOut(hdc, x + 12, y + 50, random.choice(self._MENSAGENS))
-            win32gui.SelectObject(hdc, old_f)
-            win32gui.DeleteObject(fonte_m)
+            if fonte_m is not None:
+                win32gui.SelectObject(hdc, old_f)
 
             # Botao OK.
             bx1, by1 = x + dlg_w - 90, y + dlg_h - 36
@@ -138,13 +132,13 @@ class ErrorDialogPayload(Payload):
             botao = win32gui.CreateSolidBrush(self.rgb(210, 210, 210))
             win32gui.FillRect(hdc, (bx1, by1, bx2, by2), botao)
             win32gui.DeleteObject(botao)
-            fonte_b = win32gui.CreateFont(
-                -13, 0, 0, 0, win32con.FW_NORMAL, 0, 0, 0, 0, 0, 0, 0, 0, "Arial")
-            old_f = win32gui.SelectObject(hdc, fonte_b)
+            fonte_b = criar_fonte(-13, peso=win32con.FW_NORMAL, face="Arial")
+            if fonte_b is not None:
+                old_f = win32gui.SelectObject(hdc, fonte_b)
             win32gui.SetTextColor(hdc, self.rgb(0, 0, 0))
             win32gui.TextOut(hdc, bx1 + 26, by1 + 5, "OK")
-            win32gui.SelectObject(hdc, old_f)
-            win32gui.DeleteObject(fonte_b)
+            if fonte_b is not None:
+                win32gui.SelectObject(hdc, old_f)
 
 
 class GlitchPayload(Payload):

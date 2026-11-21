@@ -1,27 +1,18 @@
 # Win32-Payload-Angelical 👁️‍🗨️🔥
 
-> Motor de efeitos visuais **GDI** para Windows, com tema de **horror / terror angelical**.
-> Projeto educacional em Python inspirado no [`Win32-Payload-Engine`](https://github.com/panda12332145/Win32-Payload-Engine).
-
-Desenha diretamente sobre a área de trabalho do Windows usando **apenas** a API GDI
-(`win32gui`, `win32con`, `win32api` do pacote **pywin32**) — sem PIL, pygame, tkinter
-ou qualquer outra dependência de interface.
-
-O destaque do projeto é o **Anjo Trono (Ophanim)**: uma recriação animada do anjo bíblico
-descrito em Ezequiel (rodas dentro de rodas, cobertas de olhos), desenhado inteiramente
-com primitivas GDI e com animação quadro a quadro.
+> Motor de efeitos visuais para Windows com tema de **horror / terror angelical**.
+> Dois engines: **OpenGL 3D** (recomendado, real em GPU) e **GDI** (legado, via pywin32).
 
 ---
 
 ## ⚠️ Aviso importante
 
-- Este projeto é **educacional**, voltado ao aprendizado de **computação gráfica com GDI**
-  (rotação 3D, projeção em perspectiva, polígonos, animação frame-a-frame).
-- Os efeitos são **puramente visuais** e **temporários**: eles desenham sobre a tela, mas
-  **não** modificam arquivos, não persistem após o fechamento, não exploram falhas, não
-  evadem antivírus e não possuem qualquer capacidade ofensiva. Pressione **ESC** ou
-  **Ctrl+C** para encerrar; a tela se recompõe normalmente.
-- Funciona **somente no Windows** (depende da GDI via pywin32).
+- Este projeto é **educacional**, voltado ao aprendizado de computação gráfica (OpenGL / GDI).
+- Os efeitos são **puramente visuais** e **temporários**: desenham na tela, mas
+  não modificam arquivos, não persistem após o fechamento e não possuem qualquer
+  capacidade ofensiva. Pressione **ESC** (ou **Ctrl+C**) para encerrar — a tela
+  se recompõe normalmente.
+- Funciona **no Windows** (via pywin32/GDI) e em plataformas com OpenGL (GL).
 
 ---
 
@@ -34,73 +25,60 @@ cd Win32-Payload-Angelical
 pip install -r requirements.txt
 ```
 
+Dependências:
+- `pywin32` — modo GDI (antigo).
+- `PyOpenGL` + `glfw` — modo OpenGL (3D, recomendado).
+
+---
+
 ## ▶️ Como usar
 
 ```bash
-python main.py            # abre o menu interativo
-python main.py --list     # lista todos os payloads
-python main.py --angel    # abre direto o Anjo Trono (Ophanim)
-python main.py --all      # roda todos os efeitos em sequência
-python main.py --fps 60   # define o FPS (padrão: 30)
+python main.py                  # menu interativo (auto: GL)
+python main.py --engine gl       # engine OpenGL 3D
+python main.py --engine gdi      # engine GDI (antigo)
+python main.py --list            # lista os efeitos
+python main.py --angel           # abre direto o Anjo Trono (Ophanim)
+python main.py --all             # roda todos em sequência
+python main.py --fps 60          # FPS (padrão: 60)
 ```
 
 Durante a execução, pressione **ESC** (ou **Ctrl+C**) para encerrar o efeito atual.
 
 ---
 
-## 🎭 Payloads disponíveis
+## 🎭 Efeitos disponíveis
 
-### 💥 Erros
-| Payload | Efeito |
+### OpenGL 3D (recomendado)
+| Efeito | Descrição |
 |---|---|
-| `BlueScreenPayload` | Tela Azul da Morte (BSOD) falsa com *stop code*. |
-| `ErrorDialogPayload` | Enxame de caixas de diálogo de erro falsas. |
-| `GlitchPayload` | Blocos RGB aleatórios (corrupção de vídeo / glitch). |
+| `OphanimAngelGl` | **Anjo Trono bíblico completo e animado em 3D** — 3 anéis girando com olhos, olho central piscando, asas batendo, fogo e brilho pulsante, texto sagrado. |
+| `EyesGl` | Olhos vigiados com piscar independente, iris dourada/vermelha, pupila acompanhando o centro. |
+| `BloodDropGl` | Gotas de sangue com gravidade e acúmulo no fundo. |
+| `CracksGl` | Rachaduras se espalhando e bifurcando. |
+| `ShadowFigureGl` | Silhueta humanoide que aparece e some em fade, com olhos vermelhos. |
+| `SkullGl` | Crânios fantasmagoricos com halo vermelho. |
+| `DarknessGl` | Vinheta de escuridão pulsante com estrelas distantes. |
+| `GlitchGl` | Corrupção de vídeo: blocos coloridos, cortes e jitter. |
 
-### 🩸 Terror
-| Payload | Efeito |
-|---|---|
-| `BloodDropPayload` | Gotas de sangue caindo com gravidade e acúmulo no fundo. |
-| `CracksPayload` | Rachaduras negras se espalhando e bifurcando pela tela. |
-| `ShadowFigurePayload` | Silhueta humanoide sombria surgindo e sumindo em *fade*. |
-| `SkullPayload` | Crânios desenhados em GDI (órbitas, dentes, mandíbula). |
-| `DarknessPayload` | Vinheta de escuridão pulsante com estrelas distantes. |
-
-### 👁️ Olhos
-| Payload | Efeito |
-|---|---|
-| `EyesPayload` | 15–25 olhos observando, piscando de forma independente, íris dourada/vermelha, pupilas que acompanham o centro da tela e veias vermelhas. |
-
-### 😇 Anjo principal
-| Payload | Efeito |
-|---|---|
-| `OphanimAngelPayload` | **Anjo Trono bíblico completo e animado.** |
+### GDI (antigo, mantido para compatibilidade)
+Todos os efeitos acima também existem no modo GDI (`--engine gdi`), além de
+`BlueScreenPayload` e `ErrorDialogPayload` (telas de erro/diálogos falsos estilo Windows).
 
 ---
 
-## 😇 O Anjo Trono (Ophanim)
+## 😇 O Anjo Trono (Ophanim) — engine OpenGL 3D
 
-Recriação do anjo bíblico (Ezequiel 1 e 10), **100% desenhado e animado em GDI**:
+Recriação do anjo biblico (Ezequiel 1 e 10):
 
-- **3 anéis concêntricos** girando em **velocidades e direções diferentes**, usando
-  **rotação 3D + projeção em perspectiva** (mesma técnica do `IconCubePayload` original).
-- Cada anel é **coberto de olhos** distribuídos pela circunferência.
-- **Olho central gigante** com íris dourada, pupila vermelho-sangue e **piscar dramático**.
-- **Duas asas simétricas** com penas em `Polygon`, **batendo** em onda senoidal.
-- **Partículas de fogo** subindo ao fundo.
-- **Brilho / chama pulsante** (elipses concêntricas em cores quentes).
-- **Texto sagrado flutuante**: *"KADOSH KADOSH KADOSH"* / *"SANTO SANTO SANTO"*.
-
-**Paleta:** dourado `RGB(255,215,0)`, vermelho vivo `RGB(220,20,60)`,
-vermelho-sangue `RGB(139,0,0)`, laranja-fogo `RGB(255,69,0)`, branco e preto.
-
-### Estado da animação (por quadro)
-- `ring_angles[3]` — ângulos dos 3 anéis (incrementados por frame).
-- `ring_tilts[3]` — inclinação 3D oscilante de cada anel.
-- `eye_blink` — ciclo de piscar do olho central.
-- `wing_phase` — fase de batimento das asas (seno).
-- `fire_particles` — lista de partículas de fogo.
-- `glow_pulse` — pulso senoidal do brilho.
+- **3 anéis concêntricos** girando em velocidades/direções diferentes, usando
+  **rotação 3D + projeção em perspectiva** (`math_3d.py`), cada um coberto de olhos.
+- **Olho central gigante** com iris dourada, pupila vermelho-sangue e piscar dramático.
+- **Duas asas simétricas** com 6 penas cada, batendo em onda senoidal.
+- **Partículas de fogo** subindo ao fundo + poeira dourada flutuante.
+- **Brilho quente pulsante** com mistura aditiva (glow real).
+- **Texto sagrado** na fonte bitmap ("KADOSH KADOSH KADOSH" / "SANTO SANTO SANTO").
+- **Poeira dourada** + vinheta suave para profundidade.
 
 ---
 
@@ -108,42 +86,32 @@ vermelho-sangue `RGB(139,0,0)`, laranja-fogo `RGB(255,69,0)`, branco e preto.
 
 ```
 Win32-Payload-Angelical/
-├── main.py                 # menu interativo / CLI
+├── main.py                     # menu interativo / CLI
 ├── requirements.txt
 ├── README.md
 ├── CHANGELOG.md
 └── src/
     ├── __init__.py
-    ├── engine.py           # loop de animação (FPS, ESC, stateful/stateless)
-    └── payloads/
-        ├── __init__.py     # exporta todos + ALL_PAYLOADS
-        ├── base.py         # classe base Payload
-        ├── errors.py       # BSOD, diálogos de erro, glitch
-        ├── terror.py       # sangue, rachaduras, sombra, crânios, escuridão
-        ├── eyes.py         # olhos vigilantes
-        └── angel.py        # Anjo Trono (Ophanim) animado
+    ├── engine.py               # loop de animação GDI (FPS, ESC)
+    ├── gl_engine.py            # loop de animação OpenGL (janela, ESC, FPS)
+    ├── gl_effects/             # effects 3D em OpenGL
+    │   ├── __init__.py         # registry GL_EFFECTS
+    │   ├── base.py             # GlEffect (base dt-based)
+    │   ├── renderer.py         # renderer (shaders, geometria, texto bitmap)
+    │   ├── font.py             # fonte bitmap 5x7
+    │   ├── math_3d.py          # rotação/projeção 3D
+    │   ├── angel.py            # Anjo Trono (Ophanim)
+    │   ├── eyes.py, blood.py, cracks.py, darkness.py,
+    │   ├── shadow.py, glitch.py, skulls.py
+    └── payloads/               # engine GDI (legado)
+        ├── __init__.py         # exporta todos + ALL_PAYLOADS
+        ├── base.py             # classe base Payload
+        ├── fonts.py            # utilitário de fontes GDI (LOGFONT)
+        ├── errors.py, terror.py, eyes.py, angel.py
 ```
-
----
-
-## 🧠 Como funciona o engine
-
-O motor obtém o *Device Context* da área de trabalho e chama `draw(hdc, w, h)` em loop:
-
-```python
-hwnd = win32gui.GetDesktopWindow()
-hdc  = win32gui.GetDC(hwnd)
-payload.draw(hdc, w, h)
-win32gui.ReleaseDC(hwnd, hdc)
-```
-
-- **Payloads com estado** (`stateful = True`) mantêm a mesma instância entre quadros,
-  permitindo animação fluida (anéis girando, asas batendo, olhos piscando).
-- **Payloads sem estado** redesenham um quadro completo a cada chamada.
-- FPS configurável via `time.sleep(1/fps)`; **ESC** encerra via `GetAsyncKeyState`.
 
 ---
 
 ## 📜 Licença
 
-Uso educacional. Veja o repositório original para referência de técnicas GDI.
+Uso educacional.

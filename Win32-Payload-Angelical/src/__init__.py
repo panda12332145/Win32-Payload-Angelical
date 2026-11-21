@@ -4,4 +4,4 @@
 Pacote principal. Exporta o engine e os payloads.
 """
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"

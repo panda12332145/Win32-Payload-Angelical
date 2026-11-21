@@ -26,6 +26,7 @@ import win32con
 import win32gui
 
 from .base import Payload
+from .fonts import criar_fonte
 
 
 class OphanimAngelPayload(Payload):
@@ -395,17 +396,17 @@ class OphanimAngelPayload(Payload):
         brilho = int(150 + pulso * 105)
         win32gui.SetTextColor(hdc, self.rgb(brilho, brilho // 2, 0))
 
-        fonte = win32gui.CreateFont(
-            -int(raio * 0.18), 0, 0, 0, win32con.FW_BOLD,
-            0, 0, 0, 0, 0, 0, 0, 0, "Times New Roman")
-        old = win32gui.SelectObject(hdc, fonte)
+        fonte = criar_fonte(-int(raio * 0.18), peso=win32con.FW_BOLD,
+                            face="Georgia")
+        if fonte is not None:
+            old = win32gui.SelectObject(hdc, fonte)
         texto = "KADOSH  KADOSH  KADOSH"
         # Centraliza aproximadamente o texto acima do anjo.
         tx = cx - int(len(texto) * raio * 0.045)
         win32gui.TextOut(hdc, tx, cy - int(raio * 2.1), texto)
         win32gui.TextOut(hdc, tx + 20, cy + int(raio * 1.9), "SANTO SANTO SANTO")
-        win32gui.SelectObject(hdc, old)
-        win32gui.DeleteObject(fonte)
+        if fonte is not None:
+            win32gui.SelectObject(hdc, old)
 
     # ------------------------------------------------------------------ #
     # Quadro principal.

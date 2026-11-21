@@ -1,3 +1,5 @@
 # Dependencias do Win32-Payload-Angelical
-# Somente pywin32 (acesso a API GDI do Windows). So instala no Windows.
+# GDI (antigo): pywin32 (Windows). GL (3D): PyOpenGL + glfw (multiplataforma).
 pywin32; sys_platform == "win32"
+PyOpenGL>=3.1.6
+glfw>=2.5.5
